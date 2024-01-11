@@ -24,6 +24,12 @@ mod ERC721 {
         ERC721_token_uri: LegacyMap<u256, felt252>
     }
 
+    #[constructor]
+    fn constructor(ref self: ContractState, name: felt252, symbol: felt252) {
+        self.ERC721_name.write(name);
+        self.ERC721_symbol.write(symbol);
+    }
+
     #[external(v0)]
     impl ExternalImplERC721 of IERC721<ContractState> {
         fn name(self: @ContractState) -> felt252 {
