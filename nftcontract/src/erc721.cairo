@@ -12,6 +12,7 @@ trait IERC721<T> {
 
 #[starknet::contract]
 mod ERC721 {
+    use core::zeroable::Zeroable;
     use super::{ContractAddress, IERC721};
 
     #[storage]
@@ -34,18 +35,32 @@ mod ERC721 {
         }
 
         fn token_uri(self: @ContractState, token_id: u256) -> felt252 {
-            //todo: do the token uri assert
+            assert(self._exists(token_id), 'INVALID_TOKEN_ID');
             self.ERC721_token_uri.read(token_id)
         }
 
         fn balance_of(self: @ContractState, account: ContractAddress) -> u256 {
-            //todo: zero address assert
+            assert(!account.is_zero(), 'INVALID_ACCOUNT');
             self.ERC721_balances.read(account)
         }
 
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
-            //todo: check if owner is zero or invalid token_id
-            self.ERC721_owners.read(token_id)
+            self._owner_of(token_id)
+        }
+    }
+
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
+            let owner = self.ERC721_owners.read(token_id);
+            match owner.is_zero() {
+                bool::False(()) => owner,
+                bool::True(()) => panic(array!['INVALID_TOKEN_ID'])
+            }
+        }
+
+        fn _exists(self: @ContractState, token_id: u256) -> bool {
+            !self.ERC721_owners.read(token_id).is_zero()
         }
     }
 }
