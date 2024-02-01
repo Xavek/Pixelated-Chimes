@@ -9,6 +9,7 @@ trait IERC721<T> {
     fn owner_of(self: @T, token_id: u256) -> ContractAddress;
     fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
     fn upload_and_mint(ref self: T, metadata_uri: felt252, price: u256);
+    fn buy_nft(ref self: T, token_id: u256, amount: u256);
 }
 
 #[starknet::contract]
@@ -73,6 +74,14 @@ mod ERC721 {
             let caller: ContractAddress = get_caller_address();
             self._upload_and_mint(caller, metadata_uri, price);
         }
+
+        fn buy_nft(ref self: ContractState, token_id: u256, amount: u256) {
+            assert(self._exists(token_id), 'INVALID_TOKEN_ID');
+            assert(amount >= self.ERC721_token_prices.read(token_id), 'INSUFFICIENT_FUNDS');
+            let caller: ContractAddress = get_caller_address();
+            assert(!caller.is_zero(), 'INVALID_CALLER');
+            self._buy_nft(caller, token_id, amount);
+        }
     }
 
     #[generate_trait]
@@ -130,6 +139,14 @@ mod ERC721 {
             self.ERC721_token_uri.write(current_token_id, metadata_uri);
             self.ERC721_token_uri_flag.write(metadata_uri, true);
             self.ERC721_id_counter.write(current_token_id + 1);
+        }
+
+        fn _buy_nft(
+            ref self: ContractState, caller: ContractAddress, token_id: u256, amount: u256
+        ) {
+            // todo: implement erc20 transfer calls and balance validation
+            let owner_or_seller = self.ERC721_owners.read(token_id);
+            self._transfer(owner_or_seller, caller, token_id);
         }
     }
 }
