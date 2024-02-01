@@ -85,6 +85,14 @@ mod ERC721 {
             self.ERC721_balances.write(to, self.ERC721_balances.read(to) + 1);
             self.ERC721_owners.write(token_id, to);
         }
+
+        fn _mint(ref self: ContractState, to: ContractAddress, token_id: u256) {
+            assert(!to.is_zero(), 'INVALID_RECEIVER');
+            assert(!self._exists(token_id), 'ALREADY_MINTED');
+
+            self.ERC721_balances.write(to, self.ERC721_balances.read(to) + 1);
+            self.ERC721_owners.write(token_id, to);
+        }
     }
 }
 
