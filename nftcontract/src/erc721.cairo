@@ -21,7 +21,9 @@ mod ERC721 {
         ERC721_symbol: felt252,
         ERC721_owners: LegacyMap<u256, ContractAddress>,
         ERC721_balances: LegacyMap<ContractAddress, u256>,
-        ERC721_token_uri: LegacyMap<u256, felt252>
+        ERC721_token_uri: LegacyMap<u256, felt252>,
+        ERC721_token_prices: LegacyMap<u256, u256>,
+        ERC721_id_counter: u256
     }
 
     #[constructor]
@@ -99,6 +101,10 @@ mod ERC721 {
 
             self.ERC721_balances.write(owner, self.ERC721_balances.read(owner) - 1);
             self.ERC721_owners.write(token_id, Zeroable::zero());
+        }
+
+        fn _current_counter(self: @ContractState) -> u256 {
+            self.ERC721_id_counter.read()
         }
     }
 }
