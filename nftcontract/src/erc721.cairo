@@ -58,11 +58,13 @@ mod ERC721 {
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
             self._owner_of(token_id)
         }
+
         fn transfer_from(
             ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256
         ) {
             self._transfer(from, to, token_id);
         }
+
         fn upload_and_mint(ref self: ContractState, metadata_uri: felt252, price: u256) {
             assert(!price.is_zero(), 'ZERO_PRICE');
             assert(
