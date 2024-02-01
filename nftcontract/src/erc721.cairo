@@ -7,7 +7,7 @@ trait IERC721<T> {
     fn token_uri(self: @T, token_id: u256) -> felt252;
     fn balance_of(self: @T, account: ContractAddress) -> u256;
     fn owner_of(self: @T, token_id: u256) -> ContractAddress;
-// fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
+    fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
 }
 
 #[starknet::contract]
@@ -53,6 +53,11 @@ mod ERC721 {
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
             self._owner_of(token_id)
         }
+        fn transfer_from(
+            ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256
+        ) {
+            self._transfer(from, to, token_id);
+        }
     }
 
     #[generate_trait]
@@ -67,6 +72,18 @@ mod ERC721 {
 
         fn _exists(self: @ContractState, token_id: u256) -> bool {
             !self.ERC721_owners.read(token_id).is_zero()
+        }
+
+        fn _transfer(
+            ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256
+        ) {
+            assert(!to.is_zero(), 'INVALID_RECEIVER');
+            let owner = self._owner_of(token_id);
+            assert(from == owner, 'WRONG_SENDER');
+
+            self.ERC721_balances.write(from, self.ERC721_balances.read(from) - 1);
+            self.ERC721_balances.write(to, self.ERC721_balances.read(to) + 1);
+            self.ERC721_owners.write(token_id, to);
         }
     }
 }
