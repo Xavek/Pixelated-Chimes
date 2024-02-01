@@ -93,6 +93,13 @@ mod ERC721 {
             self.ERC721_balances.write(to, self.ERC721_balances.read(to) + 1);
             self.ERC721_owners.write(token_id, to);
         }
+
+        fn _burn(ref self: ContractState, token_id: u256) {
+            let owner = self._owner_of(token_id);
+
+            self.ERC721_balances.write(owner, self.ERC721_balances.read(owner) - 1);
+            self.ERC721_owners.write(token_id, Zeroable::zero());
+        }
     }
 }
 
