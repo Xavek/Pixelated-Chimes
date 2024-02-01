@@ -8,12 +8,14 @@ trait IERC721<T> {
     fn balance_of(self: @T, account: ContractAddress) -> u256;
     fn owner_of(self: @T, token_id: u256) -> ContractAddress;
     fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
+    fn upload_and_mint(ref self: T, metadata_uri: felt252, price: u256);
 }
 
 #[starknet::contract]
 mod ERC721 {
     use core::zeroable::Zeroable;
     use super::{ContractAddress, IERC721};
+    use starknet::get_caller_address;
 
     #[storage]
     struct Storage {
@@ -23,7 +25,8 @@ mod ERC721 {
         ERC721_balances: LegacyMap<ContractAddress, u256>,
         ERC721_token_uri: LegacyMap<u256, felt252>,
         ERC721_token_prices: LegacyMap<u256, u256>,
-        ERC721_id_counter: u256
+        ERC721_id_counter: u256,
+        ERC721_token_uri_flag: LegacyMap<felt252, bool>
     }
 
     #[constructor]
@@ -55,10 +58,20 @@ mod ERC721 {
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
             self._owner_of(token_id)
         }
+
         fn transfer_from(
             ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256
         ) {
             self._transfer(from, to, token_id);
+        }
+
+        fn upload_and_mint(ref self: ContractState, metadata_uri: felt252, price: u256) {
+            assert(!price.is_zero(), 'ZERO_PRICE');
+            assert(
+                !self.ERC721_token_uri_flag.read(metadata_uri), 'METADATA_URI_ALREADY_SUBMITTED'
+            );
+            let caller: ContractAddress = get_caller_address();
+            self._upload_and_mint(caller, metadata_uri, price);
         }
     }
 
@@ -105,6 +118,18 @@ mod ERC721 {
 
         fn _current_counter(self: @ContractState) -> u256 {
             self.ERC721_id_counter.read()
+        }
+
+        fn _upload_and_mint(
+            ref self: ContractState, owner: ContractAddress, metadata_uri: felt252, price: u256
+        ) {
+            let current_token_id = self._current_counter();
+            self._mint(owner, current_token_id);
+            self.ERC721_owners.write(current_token_id, owner);
+            self.ERC721_token_prices.write(current_token_id, price);
+            self.ERC721_token_uri.write(current_token_id, metadata_uri);
+            self.ERC721_token_uri_flag.write(metadata_uri, true);
+            self.ERC721_id_counter.write(current_token_id + 1);
         }
     }
 }
