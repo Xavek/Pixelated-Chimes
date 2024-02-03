@@ -42,13 +42,20 @@ mod ERC721 {
         ERC721_token_uri: LegacyMap<u256, felt252>,
         ERC721_token_prices: LegacyMap<u256, u256>,
         ERC721_id_counter: u256,
-        ERC721_token_uri_flag: LegacyMap<felt252, bool>
+        ERC721_token_uri_flag: LegacyMap<felt252, bool>,
+        ERC20_token_contract: ContractAddress
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, name: felt252, symbol: felt252) {
+    fn constructor(
+        ref self: ContractState,
+        name: felt252,
+        symbol: felt252,
+        erc20_token_contract: ContractAddress
+    ) {
         self.ERC721_name.write(name);
         self.ERC721_symbol.write(symbol);
+        self.ERC20_token_contract.write(erc20_token_contract);
     }
 
     #[abi(embed_v0)]
@@ -92,9 +99,12 @@ mod ERC721 {
 
         fn buy_nft(ref self: ContractState, token_id: u256, amount: u256) {
             assert(self._exists(token_id), 'INVALID_TOKEN_ID');
-            assert(amount >= self.ERC721_token_prices.read(token_id), 'INSUFFICIENT_FUNDS');
+            assert(amount == self.ERC721_token_prices.read(token_id), 'INSUFFICIENT_FUNDS');
             let caller: ContractAddress = get_caller_address();
             assert(!caller.is_zero(), 'INVALID_CALLER');
+            let caller_current_balance: u256 = self
+                ._check_erc20_balance(self.ERC20_token_contract.read(), caller);
+            assert(caller_current_balance >= amount, 'INSUFFICIENT_ERC20_BALANCE');
             self._buy_nft(caller, token_id, amount);
         }
     }
@@ -162,6 +172,18 @@ mod ERC721 {
             // todo: implement erc20 transfer calls and balance validation
             let owner_or_seller = self.ERC721_owners.read(token_id);
             self._transfer(owner_or_seller, caller, token_id);
+        }
+
+        fn _check_erc20_balance(
+            ref self: ContractState,
+            erc20_contract_address: ContractAddress,
+            user_address: ContractAddress
+        ) -> u256 {
+            let current_balance: u256 = IERC20Dispatcher {
+                contract_address: erc20_contract_address
+            }
+                .balance_of(user_address);
+            current_balance
         }
 
         fn _do_erc20_transfer(
