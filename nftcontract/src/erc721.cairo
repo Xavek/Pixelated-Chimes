@@ -196,7 +196,18 @@ mod ERC721 {
             let amount_u256: u256 = amount.into();
             let transfer_return_flag = IERC20Dispatcher { contract_address: contract_address }
                 .transfer_from(from, to, amount_u256);
-            assert(transfer_return_flag, 'NFT_BUY_FAIL_ERC20');
+            assert(transfer_return_flag, 'NFT_BUY_FAIL_ERC20_TRANSFER');
+        }
+
+        fn _do_erc20_approve(
+            ref self: ContractState,
+            erc20_contract_address: ContractAddress,
+            spender: ContractAddress,
+            amount: u256
+        ) {
+            let approve_return_flag = IERC20Dispatcher { contract_address: erc20_contract_address }
+                .approve(spender, amount);
+            assert(approve_return_flag, 'NFT_BUY_FAIL_ERC20_APPROVE');
         }
     }
 }
