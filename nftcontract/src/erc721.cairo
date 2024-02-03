@@ -12,10 +12,25 @@ trait IERC721<T> {
     fn buy_nft(ref self: T, token_id: u256, amount: u256);
 }
 
+#[starknet::interface]
+trait IERC20<TState> {
+    fn name(self: @TState) -> felt252;
+    fn symbol(self: @TState) -> felt252;
+    fn decimals(self: @TState) -> u8;
+    fn total_supply(self: @TState) -> u256;
+    fn balance_of(self: @TState, account: ContractAddress) -> u256;
+    fn allowance(self: @TState, owner: ContractAddress, spender: ContractAddress) -> u256;
+    fn transfer(ref self: TState, recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(
+        ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256
+    ) -> bool;
+    fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
+}
+
 #[starknet::contract]
 mod ERC721 {
     use core::zeroable::Zeroable;
-    use super::{ContractAddress, IERC721};
+    use super::{ContractAddress, IERC721, IERC20, IERC20Dispatcher, IERC20DispatcherTrait};
     use starknet::get_caller_address;
 
     #[storage]
@@ -36,7 +51,7 @@ mod ERC721 {
         self.ERC721_symbol.write(symbol);
     }
 
-    #[external(v0)]
+    #[abi(embed_v0)]
     impl ExternalImplERC721 of IERC721<ContractState> {
         fn name(self: @ContractState) -> felt252 {
             self.ERC721_name.read()
@@ -147,6 +162,19 @@ mod ERC721 {
             // todo: implement erc20 transfer calls and balance validation
             let owner_or_seller = self.ERC721_owners.read(token_id);
             self._transfer(owner_or_seller, caller, token_id);
+        }
+
+        fn _do_erc20_transfer(
+            ref self: ContractState,
+            contract_address: ContractAddress,
+            from: ContractAddress,
+            to: ContractAddress,
+            amount: u256
+        ) {
+            let amount_u256: u256 = amount.into();
+            let transfer_return_flag = IERC20Dispatcher { contract_address: contract_address }
+                .transfer_from(from, to, amount_u256);
+            assert(transfer_return_flag, 'NFT_BUY_FAIL_ERC20');
         }
     }
 }
