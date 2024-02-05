@@ -31,7 +31,7 @@ trait IERC20<TState> {
 mod ERC721 {
     use core::zeroable::Zeroable;
     use super::{ContractAddress, IERC721, IERC20, IERC20Dispatcher, IERC20DispatcherTrait};
-    use starknet::get_caller_address;
+    use starknet::{get_caller_address, get_contract_address};
 
     #[storage]
     struct Storage {
@@ -169,8 +169,18 @@ mod ERC721 {
         fn _buy_nft(
             ref self: ContractState, caller: ContractAddress, token_id: u256, amount: u256
         ) {
-            // todo: implement erc20 transfer calls and balance validation
             let owner_or_seller = self.ERC721_owners.read(token_id);
+            self
+                ._do_erc20_approve(
+                    self.ERC20_token_contract.read(), get_contract_address(), amount
+                );
+            self
+                ._do_erc20_transfer(
+                    self.ERC20_token_contract.read(),
+                    owner_or_seller,
+                    get_contract_address(),
+                    amount
+                );
             self._transfer(owner_or_seller, caller, token_id);
         }
 
@@ -194,9 +204,15 @@ mod ERC721 {
             amount: u256
         ) {
             let amount_u256: u256 = amount.into();
+            let current_amount_of_this_contract = self
+                ._check_erc20_balance(self.ERC20_token_contract.read(), get_contract_address());
             let transfer_return_flag = IERC20Dispatcher { contract_address: contract_address }
                 .transfer_from(from, to, amount_u256);
             assert(transfer_return_flag, 'NFT_BUY_FAIL_ERC20_TRANSFER');
+            assert(
+                current_amount_of_this_contract == current_amount_of_this_contract + amount,
+                'BUYER_TRANSFERED_LESS_OR_MORE'
+            )
         }
 
         fn _do_erc20_approve(
