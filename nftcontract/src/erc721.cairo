@@ -204,9 +204,15 @@ mod ERC721 {
             amount: u256
         ) {
             let amount_u256: u256 = amount.into();
+            let current_amount_of_this_contract = self
+                ._check_erc20_balance(self.ERC20_token_contract.read(), get_contract_address());
             let transfer_return_flag = IERC20Dispatcher { contract_address: contract_address }
                 .transfer_from(from, to, amount_u256);
             assert(transfer_return_flag, 'NFT_BUY_FAIL_ERC20_TRANSFER');
+            assert(
+                current_amount_of_this_contract == current_amount_of_this_contract + amount,
+                'BUYER_TRANSFERED_LESS_OR_MORE'
+            )
         }
 
         fn _do_erc20_approve(
