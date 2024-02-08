@@ -168,6 +168,7 @@ mod ERC721 {
             self.ERC721_token_prices.write(current_token_id, price);
             self.ERC721_token_uri.write(current_token_id, metadata_uri);
             self.ERC721_token_uri_flag.write(metadata_uri, true);
+            self.ERC721_balances.write(owner, self.ERC721_balances.read(owner) + 1);
             self.ERC721_id_counter.write(current_token_id + 1);
         }
 
