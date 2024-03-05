@@ -176,13 +176,9 @@ mod ERC721 {
             ref self: ContractState, caller: ContractAddress, token_id: u256, amount: u256
         ) {
             let owner_or_seller = self.ERC721_owners.read(token_id);
-
             self
                 ._do_erc20_transfer(
-                    self.ERC20_token_contract.read(),
-                    owner_or_seller,
-                    get_contract_address(),
-                    amount
+                    self.ERC20_token_contract.read(), caller, get_contract_address(), amount
                 );
             self._transfer(owner_or_seller, caller, token_id);
         }
@@ -213,4 +209,3 @@ mod ERC721 {
         }
     }
 }
-
