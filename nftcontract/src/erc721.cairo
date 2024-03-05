@@ -16,10 +16,6 @@ trait IERC721<T> {
 
 #[starknet::interface]
 trait IERC20<TState> {
-    fn name(self: @TState) -> felt252;
-    fn symbol(self: @TState) -> felt252;
-    fn decimals(self: @TState) -> u8;
-    fn total_supply(self: @TState) -> u256;
     fn balance_of(self: @TState, account: ContractAddress) -> u256;
     fn allowance(self: @TState, owner: ContractAddress, spender: ContractAddress) -> u256;
     fn transfer(ref self: TState, recipient: ContractAddress, amount: u256) -> bool;
@@ -170,11 +166,9 @@ mod ERC721 {
         ) {
             let current_token_id = self._current_counter();
             self._mint(owner, current_token_id);
-            self.ERC721_owners.write(current_token_id, owner);
             self.ERC721_token_prices.write(current_token_id, price);
             self.ERC721_token_uri.write(current_token_id, metadata_uri);
             self.ERC721_token_uri_flag.write(metadata_uri, true);
-            self.ERC721_balances.write(owner, self.ERC721_balances.read(owner) + 1);
             self.ERC721_id_counter.write(current_token_id + 1);
         }
 
@@ -183,15 +177,8 @@ mod ERC721 {
         ) {
             let owner_or_seller = self.ERC721_owners.read(token_id);
             self
-                ._do_erc20_approve(
-                    self.ERC20_token_contract.read(), get_contract_address(), amount
-                );
-            self
                 ._do_erc20_transfer(
-                    self.ERC20_token_contract.read(),
-                    owner_or_seller,
-                    get_contract_address(),
-                    amount
+                    self.ERC20_token_contract.read(), caller, get_contract_address(), amount
                 );
             self._transfer(owner_or_seller, caller, token_id);
         }
@@ -216,27 +203,9 @@ mod ERC721 {
             amount: u256
         ) {
             let amount_u256: u256 = amount.into();
-            let current_amount_of_this_contract = self
-                ._check_erc20_balance(self.ERC20_token_contract.read(), get_contract_address());
             let transfer_return_flag = IERC20Dispatcher { contract_address: contract_address }
                 .transfer_from(from, to, amount_u256);
             assert(transfer_return_flag, 'NFT_BUY_FAIL_ERC20_TRANSFER');
-            assert(
-                current_amount_of_this_contract == current_amount_of_this_contract + amount,
-                'BUYER_TRANSFERED_LESS_OR_MORE'
-            )
-        }
-
-        fn _do_erc20_approve(
-            ref self: ContractState,
-            erc20_contract_address: ContractAddress,
-            spender: ContractAddress,
-            amount: u256
-        ) {
-            let approve_return_flag = IERC20Dispatcher { contract_address: erc20_contract_address }
-                .approve(spender, amount);
-            assert(approve_return_flag, 'NFT_BUY_FAIL_ERC20_APPROVE');
         }
     }
 }
-
