@@ -13,7 +13,7 @@ const Navbar = () => {
         <span className="text-white text-xl font-bold">MarketPlace</span>
       </div>
       <div className="flex items-center ">
-        <ul>
+        <ul className="flex items-start">
           {status === "disconnected" &&
             connectors.map((connector) => (
               <li key={connector.id}>
