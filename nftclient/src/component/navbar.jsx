@@ -1,8 +1,9 @@
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 
 const Navbar = () => {
   const { connect, connectors } = useConnect();
   const { address, status, account } = useAccount();
+  const { disconnect } = useDisconnect();
   const sliceAddressForView = (addrs) => {
     return `${addrs.slice(0, 6)}...${addrs.slice(-6)}`;
   };
@@ -28,7 +29,7 @@ const Navbar = () => {
           {status === "connected" && (
             <button
               className="bg-white text-black px-6 py-2 mx-2 rounded-md"
-              onClick={() => connect()}
+              onClick={() => disconnect()}
             >
               {sliceAddressForView(address)}
             </button>
