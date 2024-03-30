@@ -2,7 +2,7 @@ import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 
 const Navbar = () => {
   const { connect, connectors } = useConnect();
-  const { address, status, account } = useAccount();
+  const { address, status } = useAccount();
   const { disconnect } = useDisconnect();
   const sliceAddressForView = (addrs) => {
     return `${addrs.slice(0, 6)}...${addrs.slice(-6)}`;
