@@ -1,7 +1,6 @@
 use starknet::ContractAddress;
 #[starknet::interface]
 trait IERC721<T> {
-    // NFT Metadata
     fn name(self: @T) -> felt252;
     fn symbol(self: @T) -> felt252;
     fn token_uri(self: @T, token_id: u256) -> felt252;
@@ -10,7 +9,7 @@ trait IERC721<T> {
     fn allowed_erc20_address(self: @T) -> ContractAddress;
     fn price_of_token_id(self: @T, token_id: u256) -> u256;
     fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
-    fn upload_and_mint(ref self: T, metadata_uri: felt252, price: u256);
+    fn upload_and_mint(ref self: T, metadata_uri: felt252, price: u256, token_name: felt252);
     fn buy_nft(ref self: T, token_id: u256, amount: u256);
 }
 
@@ -39,6 +38,7 @@ mod ERC721 {
         ERC721_balances: LegacyMap<ContractAddress, u256>,
         ERC721_token_uri: LegacyMap<u256, felt252>,
         ERC721_token_prices: LegacyMap<u256, u256>,
+        ERC721_token_name: LegacyMap<u256, felt252>,
         ERC721_id_counter: u256,
         ERC721_token_uri_flag: LegacyMap<felt252, bool>,
         ERC20_token_contract: ContractAddress
@@ -95,13 +95,15 @@ mod ERC721 {
             self._transfer(from, to, token_id);
         }
 
-        fn upload_and_mint(ref self: ContractState, metadata_uri: felt252, price: u256) {
+        fn upload_and_mint(
+            ref self: ContractState, metadata_uri: felt252, price: u256, token_name: felt252
+        ) {
             assert(!price.is_zero(), 'ZERO_PRICE');
             assert(
                 !self.ERC721_token_uri_flag.read(metadata_uri), 'METADATA_URI_ALREADY_SUBMITTED'
             );
             let caller: ContractAddress = get_caller_address();
-            self._upload_and_mint(caller, metadata_uri, price);
+            self._upload_and_mint(caller, metadata_uri, price, token_name);
         }
 
         fn buy_nft(ref self: ContractState, token_id: u256, amount: u256) {
@@ -162,12 +164,17 @@ mod ERC721 {
         }
 
         fn _upload_and_mint(
-            ref self: ContractState, owner: ContractAddress, metadata_uri: felt252, price: u256
+            ref self: ContractState,
+            owner: ContractAddress,
+            metadata_uri: felt252,
+            price: u256,
+            token_name: felt252
         ) {
             let current_token_id = self._current_counter();
             self._mint(owner, current_token_id);
             self.ERC721_token_prices.write(current_token_id, price);
             self.ERC721_token_uri.write(current_token_id, metadata_uri);
+            self.ERC721_token_name.write(current_token_id, token_name);
             self.ERC721_token_uri_flag.write(metadata_uri, true);
             self.ERC721_id_counter.write(current_token_id + 1);
         }
