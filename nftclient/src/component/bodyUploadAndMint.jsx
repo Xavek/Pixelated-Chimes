@@ -5,6 +5,7 @@ const UploadForm = () => {
   const [inputs, setInputs] = useState({
     amount: "",
     imageShortUrl: "",
+    tokenName: "",
   });
 
   const handleInputChange = (event) => {
@@ -20,7 +21,7 @@ const UploadForm = () => {
   };
   const handleFinalUpload = () => {
     console.log(inputs);
-    setInputs({ imageShortUrl: "", amount: "" });
+    setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
     setSubmittedURL("");
   };
 
@@ -29,6 +30,18 @@ const UploadForm = () => {
       <div className="flex items-center justify-center w-1/2 mx-auto p-4">
         <div className="flex flex-col items-start">
           <h2 className="font-semibold text-xl my-2">Upload And Mint</h2>
+          <label htmlFor="tokenName" className="mb-2">
+            Token Name
+          </label>
+          <input
+            id="tokenName"
+            name="tokenName"
+            type="text"
+            placeholder="Enter The Token Name"
+            onChange={handleInputChange}
+            value={inputs.tokenName}
+            className="border border-gray-300 rounded-md px-4 py-2 mb-4"
+          />
           <label htmlFor="amount" className="mb-2">
             Amount
           </label>
