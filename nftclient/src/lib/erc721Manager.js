@@ -17,6 +17,21 @@ export class ERC721Manager {
     return abi;
   }
 
+  async getERC20ContractAbi(contractAddress) {
+    const { abi } =
+      await this.getProviderRPCInstance().getClassAt(contractAddress);
+    return abi;
+  }
+
+  async getERC20ContractWriteInstance(account, contractAddress) {
+    const contractInstance = new Contract(
+      this.getERC20ContractAbi(contractAddress),
+      contractAddress,
+      account,
+    );
+    contractInstance;
+  }
+
   async getContractWriteInstance(account) {
     const contractInstance = new Contract(
       this.getContractAbi(),
@@ -43,5 +58,16 @@ export class ERC721Manager {
   async readContractFunction(functionName, contractCallData) {
     const contractReadInstance = this.getContractReadInstance();
     return (await contractReadInstance).call(functionName, contractCallData);
+  }
+
+  async invokeERC20ApproveFunction(account, contractAddress, contractCallData) {
+    const erc20ContractWriteInstance = this.getERC20ContractWriteInstance(
+      account,
+      contractAddress,
+    );
+    return (await erc20ContractWriteInstance).invoke(
+      "approve",
+      contractCallData,
+    );
   }
 }
