@@ -1,3 +1,6 @@
+import { useAccount } from "@starknet-react/core";
+import { buyNFT } from "../lib/erc721Api";
+import { erc721ManagerInstance } from "../lib/erc721Manager";
 const NFTMock = [
   {
     tokenId: 9,
@@ -20,7 +23,13 @@ const NFTMock = [
 ];
 
 const NFTCard = ({ tokenId, image, text, amount }) => {
-  const handleBuyClick = () => {
+  const { status, account } = useAccount();
+  const handleBuyClick = async () => {
+    if (status === "disconnected") {
+      alert(`Connect To Wallet. Disconnected atm`);
+      throw Error(`Must be connected to Wallet`);
+    }
+    await buyNFT(erc721ManagerInstance, account, tokenId, amount);
     console.log(`Buying ${tokenId} for ${amount}`);
   };
 

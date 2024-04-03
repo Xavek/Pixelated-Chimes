@@ -8,3 +8,7 @@ export const ERC20_ADDRESS = "";
 export const sliceAddressForView = (addrs) => {
   return `${addrs.slice(0, 6)}...${addrs.slice(-6)}`;
 };
+
+export const validateTokenUri = (tokenUriStr) => {
+  return tokenUriStr.length <= 31 ? true : false;
+};
