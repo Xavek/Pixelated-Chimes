@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { validateTokenUri } from "../lib/utils";
+import { erc721ManagerInstance } from "../lib/erc721Manager";
+import { uploadNFT } from "../lib/erc721Api";
 
 const UploadForm = () => {
   const { account, status } = useAccount();
@@ -22,22 +24,29 @@ const UploadForm = () => {
   const handleImageTest = () => {
     setSubmittedURL(inputs.imageShortUrl);
   };
-  const handleFinalUpload = () => {
+  const handleFinalUpload = async () => {
     console.log(inputs);
     if (status === "disconnected") {
       alert(`Connect To Wallet. Disconnected atm`);
       throw Error(`Must be connected to Wallet`);
     }
     const isShortUrl = validateTokenUri(inputs.imageShortUrl);
-    if (isShortUrl) {
-      // interact with chain
+    const isShortName = validateTokenUri(inputs.tokenName);
+    if (isShortUrl && isShortName) {
+      await uploadNFT(
+        erc721ManagerInstance,
+        account,
+        inputs.tokenName,
+        inputs.imageShortUrl,
+        inputs.amount,
+      );
       setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
       setSubmittedURL("");
     } else {
-      alert(`Provided image url too big. must be < 31 chars`);
+      alert(`Provided image url too big or token name. must be < 31 chars`);
       setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
       setSubmittedURL("");
-      throw Error(`Image URL must be below 31 chars long`);
+      throw Error(`Image URL and Token Name must be below 31 chars long`);
     }
   };
 

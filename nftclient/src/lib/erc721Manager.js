@@ -1,6 +1,7 @@
 import { RpcProvider } from "starknet";
+import { DEPLOYED_CONTRACT_ADDRESS, NODE_URL_API } from "./utils";
 
-export class ERC721Manager {
+class ERC721Manager {
   constructor(apiUrl, address) {
     this.apiUrl = apiUrl;
     this.address = address;
@@ -71,3 +72,8 @@ export class ERC721Manager {
     );
   }
 }
+
+export const erc721ManagerInstance = new ERC721Manager(
+  NODE_URL_API,
+  DEPLOYED_CONTRACT_ADDRESS,
+);
