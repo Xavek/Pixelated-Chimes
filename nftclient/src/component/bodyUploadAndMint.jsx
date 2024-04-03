@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { validateTokenUri } from "../lib/utils";
 
 const UploadForm = () => {
   const [submittedURL, setSubmittedURL] = useState("");
@@ -21,6 +22,13 @@ const UploadForm = () => {
   };
   const handleFinalUpload = () => {
     console.log(inputs);
+    const isShortUrl = validateTokenUri(inputs.imageShortUrl);
+    if (isShortUrl) {
+      // interact with chain
+      setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
+      setSubmittedURL("");
+    }
+    alert(`Provided image url too big. must be < 31 chars`);
     setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
     setSubmittedURL("");
   };
