@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useAccount } from "@starknet-react/core";
 import { validateTokenUri } from "../lib/utils";
 
 const UploadForm = () => {
+  const { account, status } = useAccount();
   const [submittedURL, setSubmittedURL] = useState("");
   const [inputs, setInputs] = useState({
     amount: "",
@@ -22,15 +24,21 @@ const UploadForm = () => {
   };
   const handleFinalUpload = () => {
     console.log(inputs);
+    if (status === "disconnected") {
+      alert(`Connect To Wallet. Disconnected atm`);
+      throw Error(`Must be connected to Wallet`);
+    }
     const isShortUrl = validateTokenUri(inputs.imageShortUrl);
     if (isShortUrl) {
       // interact with chain
       setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
       setSubmittedURL("");
+    } else {
+      alert(`Provided image url too big. must be < 31 chars`);
+      setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
+      setSubmittedURL("");
+      throw Error(`Image URL must be below 31 chars long`);
     }
-    alert(`Provided image url too big. must be < 31 chars`);
-    setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
-    setSubmittedURL("");
   };
 
   return (
