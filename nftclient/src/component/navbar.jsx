@@ -1,12 +1,11 @@
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+import { sliceAddressForView } from "../lib/utils";
 import { Link, Outlet } from "react-router-dom";
 const Navbar = () => {
   const { connect, connectors } = useConnect();
   const { address, status } = useAccount();
   const { disconnect } = useDisconnect();
-  const sliceAddressForView = (addrs) => {
-    return `${addrs.slice(0, 6)}...${addrs.slice(-6)}`;
-  };
+
   return (
     <>
       <nav className="bg-black p-4 flex justify-between">
