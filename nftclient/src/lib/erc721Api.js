@@ -33,8 +33,22 @@ export const uploadNFT = async (
 
 // Read Methods
 
-export const priceOfNFT = async (ERC721Manager, tokenId) => {};
+export const priceOfNFT = async (ERC721Manager, tokenId) => {
+  const contractInvokeData = [tokenId];
+  const contractResponse = await ERC721Manager.readContractFunction(
+    "price_of_token_id",
+    contractInvokeData,
+  );
+  return contractResponse;
+};
 
-export const ownerOfNFT = async (ERC721Manager, tokenId) => {};
+export const ownerOfNFT = async (ERC721Manager, tokenId) => {
+  const contractInvokeData = [tokenId];
+  const contractResponse = await ERC721Manager.readContractFunction(
+    "owner_of",
+    contractInvokeData,
+  );
+  return contractResponse;
+};
 
 export const titleOfNFT = async (ERC721Manager, tokenId) => {};
