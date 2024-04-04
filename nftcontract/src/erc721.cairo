@@ -8,6 +8,7 @@ trait IERC721<T> {
     fn owner_of(self: @T, token_id: u256) -> ContractAddress;
     fn allowed_erc20_address(self: @T) -> ContractAddress;
     fn price_of_token_id(self: @T, token_id: u256) -> u256;
+    fn token_title(self:@T, token_id:u256)-> felt252;
     fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
     fn upload_and_mint(ref self: T, metadata_uri: felt252, price: u256, token_name: felt252);
     fn buy_nft(ref self: T, token_id: u256, amount: u256);
@@ -79,6 +80,10 @@ mod ERC721 {
 
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
             self._owner_of(token_id)
+        }
+
+        fn token_title(self:@ContractState, token_id:u256) -> felt252 {
+            self.ERC721_token_name.read(token_id)
         }
 
         fn allowed_erc20_address(self: @ContractState) -> ContractAddress {
