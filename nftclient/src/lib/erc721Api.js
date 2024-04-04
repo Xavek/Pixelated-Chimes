@@ -51,4 +51,11 @@ export const ownerOfNFT = async (ERC721Manager, tokenId) => {
   return contractResponse;
 };
 
-export const titleOfNFT = async (ERC721Manager, tokenId) => {};
+export const titleOfNFT = async (ERC721Manager, tokenId) => {
+  const contractInvokeData = [tokenId];
+  const contractResponse = await ERC721Manager.readContractFunction(
+    "token_title",
+    contractInvokeData,
+  );
+  return contractResponse;
+};

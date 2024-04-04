@@ -1,5 +1,5 @@
 import { useAccount } from "@starknet-react/core";
-import { buyNFT } from "../lib/erc721Api";
+import { buyNFT, ownerOfNFT, priceOfNFT, titleOfNFT } from "../lib/erc721Api";
 import { erc721ManagerInstance } from "../lib/erc721Manager";
 const NFTMock = [
   {
@@ -29,6 +29,15 @@ const NFTCard = ({ tokenId, image, text, amount }) => {
       alert(`Connect To Wallet. Disconnected atm`);
       throw Error(`Must be connected to Wallet`);
     }
+    //todo: need to transform the data of return?
+    // todo: change into promise.all with transform ?
+    const tokenTitle = await titleOfNFT(erc721ManagerInstance, 1);
+    console.log(tokenTitle);
+    const tokenOwner = await ownerOfNFT(erc721ManagerInstance, 1);
+    console.log(tokenOwner);
+    const tokenPrice = await priceOfNFT(erc721ManagerInstance, 1);
+    console.log(tokenPrice);
+
     await buyNFT(erc721ManagerInstance, account, tokenId, amount);
     console.log(`Buying ${tokenId} for ${amount}`);
   };
