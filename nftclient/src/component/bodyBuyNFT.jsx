@@ -1,28 +1,35 @@
 import { useAccount } from "@starknet-react/core";
 import { buyNFT, ownerOfNFT, priceOfNFT, titleOfNFT } from "../lib/erc721Api";
 import { erc721ManagerInstance } from "../lib/erc721Manager";
+import { sliceAddressForView } from "../lib/utils";
 const NFTMock = [
   {
     tokenId: 9,
     tokenUri: "https://via.placeholder.com/200",
     tokenName: "Product 1",
     amount: "0.01",
+    ownerAddress:
+      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   },
   {
     tokenId: 6,
     tokenUri: "https://via.placeholder.com/200",
     tokenName: "Product 2",
     amount: "0.02",
+    ownerAddress:
+      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   },
   {
     tokenId: 5,
     tokenUri: "https://via.placeholder.com/200",
     tokenName: "Product 3",
     amount: "0.1",
+    ownerAddress:
+      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   },
 ];
 
-const NFTCard = ({ tokenId, image, text, amount }) => {
+const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
   const { status, account } = useAccount();
   const handleBuyClick = async () => {
     if (status === "disconnected") {
@@ -48,6 +55,9 @@ const NFTCard = ({ tokenId, image, text, amount }) => {
       <div className="px-6 py-4">
         <div className="font-bold text-xl mb-2">{text}</div>
         <p className="text-gray-700 text-base">{amount} eth</p>
+        <p className="text-gray-700 text-base">
+          {sliceAddressForView(ownerAddress)}
+        </p>
       </div>
       <div className="px-6 py-4">
         <button
@@ -71,6 +81,7 @@ const NFTList = () => {
           image={product.tokenUri}
           text={product.tokenName}
           amount={product.amount}
+          ownerAddress={product.ownerAddress}
         />
       ))}
     </div>
