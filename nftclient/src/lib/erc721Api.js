@@ -3,8 +3,17 @@ export const doERC20Approve = async (
   ERC721Manager,
   account,
   amount,
-  contractAddress,
-) => {};
+  ERC20ContractAddress,
+  spender,
+) => {
+  const contractInvokeData = [spender, amount];
+  const contractResponse = await ERC721Manager.invokeERC20ApproveFunction(
+    account,
+    ERC20ContractAddress,
+    contractInvokeData,
+  );
+  console.log(contractResponse);
+};
 export const buyNFT = async (ERC721Manager, account, tokenId, amount) => {
   const contractInvokeData = [tokenId, amount];
   const contractResponse = await ERC721Manager.invokeContractFunction(
