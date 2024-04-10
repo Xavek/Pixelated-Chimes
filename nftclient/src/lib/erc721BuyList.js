@@ -1,3 +1,5 @@
+import { nftTokenCounterId } from "./erc721Api";
+
 const NFTDefaultData = [
   {
     tokenId: 9,
@@ -26,6 +28,7 @@ const NFTDefaultData = [
 ];
 
 export const fetchNFTData = async (erc721ManagerInstance) => {
+  // const counterID = await nftTokenCounterId(erc721ManagerInstance)
   const counterId = 0;
   if (counterId > 1) {
     const arrOfObj = [];
