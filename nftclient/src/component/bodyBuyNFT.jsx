@@ -12,32 +12,6 @@ import {
   ERC20_ADDRESS,
   sliceAddressForView,
 } from "../lib/utils";
-const NFTMock = [
-  {
-    tokenId: 9,
-    tokenUri: "https://via.placeholder.com/200",
-    tokenName: "Product 1",
-    amount: "0.01",
-    ownerAddress:
-      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-  },
-  {
-    tokenId: 6,
-    tokenUri: "https://via.placeholder.com/200",
-    tokenName: "Product 2",
-    amount: "0.02",
-    ownerAddress:
-      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-  },
-  {
-    tokenId: 5,
-    tokenUri: "https://via.placeholder.com/200",
-    tokenName: "Product 3",
-    amount: "0.1",
-    ownerAddress:
-      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-  },
-];
 
 const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
   const { status, account } = useAccount();
@@ -48,12 +22,7 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
     }
     try {
       console.log(`Buying ${tokenId} for ${amount}`);
-      const tokenTitle = await titleOfNFT(erc721ManagerInstance, 1);
-      console.log(tokenTitle);
-      const tokenOwner = await ownerOfNFT(erc721ManagerInstance, 1);
-      console.log(tokenOwner);
-      const tokenPrice = await priceOfNFT(erc721ManagerInstance, 1);
-      console.log(tokenPrice);
+
       await doERC20Approve(
         erc721ManagerInstance,
         account,
@@ -89,10 +58,10 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
   );
 };
 
-const NFTList = () => {
+const NFTList = (props) => {
   return (
     <div className="flex justify-center">
-      {NFTMock.map((product) => (
+      {props.NFTData.map((product) => (
         <NFTCard
           key={product.tokenId}
           tokenId={product.tokenId}
