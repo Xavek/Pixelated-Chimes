@@ -1,11 +1,6 @@
 import { useAccount } from "@starknet-react/core";
-import {
-  buyNFT,
-  doERC20Approve,
-  ownerOfNFT,
-  priceOfNFT,
-  titleOfNFT,
-} from "../lib/erc721Api";
+import { buyNFT, doERC20Approve } from "../lib/erc721Api";
+import { ethers } from "ethers";
 import { erc721ManagerInstance } from "../lib/erc721Manager";
 import {
   DEPLOYED_CONTRACT_ADDRESS,
@@ -26,11 +21,16 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
       await doERC20Approve(
         erc721ManagerInstance,
         account,
-        amount,
+        ethers.parseEther(amount),
         ERC20_ADDRESS,
         DEPLOYED_CONTRACT_ADDRESS,
       );
-      await buyNFT(erc721ManagerInstance, account, tokenId, amount);
+      await buyNFT(
+        erc721ManagerInstance,
+        account,
+        tokenId,
+        ethers.parseEther(amount),
+      );
     } catch (error) {
       console.log(error);
     }

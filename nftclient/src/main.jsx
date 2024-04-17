@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     connectors={connectors}
     provider={publicProvider()}
     explorer={voyager}
-    chains={[mainnet, goerli, sepolia]}
+    chains={[sepolia]}
   >
     <RouterProvider router={router} />
   </StarknetConfig>,

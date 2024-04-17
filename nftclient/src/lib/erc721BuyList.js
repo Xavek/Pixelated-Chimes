@@ -1,5 +1,12 @@
-import { nftTokenCounterId } from "./erc721Api";
-
+import {
+  nftTokenCounterId,
+  titleOfNFT,
+  ownerOfNFT,
+  priceOfNFT,
+  nftTokenURI,
+} from "./erc721Api";
+import { shortString } from "starknet";
+import { ethers } from "ethers";
 const NFTDefaultData = [
   {
     tokenId: 9,
@@ -28,20 +35,23 @@ const NFTDefaultData = [
 ];
 
 export const fetchNFTData = async (erc721ManagerInstance) => {
-  // const counterID = await nftTokenCounterId(erc721ManagerInstance)
-  const counterId = 0;
-  if (counterId > 1) {
+  const counterIDe = await nftTokenCounterId(erc721ManagerInstance);
+  const counterId = Number(counterIDe) - 1;
+  if (counterId >= 1) {
     const arrOfObj = [];
     for (let i = 1; i <= counterId; i++) {
       const tokenTitle = await titleOfNFT(erc721ManagerInstance, counterId);
       const tokenOwner = await ownerOfNFT(erc721ManagerInstance, counterId);
       const tokenPrice = await priceOfNFT(erc721ManagerInstance, counterId);
+      const tokenUri = await nftTokenURI(erc721ManagerInstance, counterId);
       const tokenDataObj = {
         tokenId: counterId,
-        tokenName: tokenTitle,
-        amount: tokenPrice,
-        ownerAddress: tokenOwner,
+        tokenName: shortString.decodeShortString(tokenTitle),
+        amount: ethers.formatEther(tokenPrice),
+        ownerAddress: tokenOwner.toString(16),
+        tokenUri: shortString.decodeShortString(tokenUri),
       };
+      console.log(tokenDataObj);
       arrOfObj.push(tokenDataObj);
     }
     return arrOfObj;
