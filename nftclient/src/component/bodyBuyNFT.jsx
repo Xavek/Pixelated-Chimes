@@ -41,9 +41,9 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
       <img className="w-full" src={image} alt="Product" />
       <div className="px-6 py-4">
         <div className="font-bold text-xl mb-2">{text}</div>
-        <p className="text-gray-700 text-base">{amount} eth</p>
+        <p className="text-gray-700 text-base">Amount: {amount} eth</p>
         <p className="text-gray-700 text-base">
-          {sliceAddressForView(ownerAddress)}
+          {`Owner: ${sliceAddressForView(ownerAddress)}`}
         </p>
       </div>
       <div className="px-6 py-4">
@@ -51,7 +51,9 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
           className="bg-black text-white px-4 py-2 rounded-md w-full"
           onClick={handleBuyClick}
         >
-          Buy
+          {status === "connected" && account.address === ownerAddress
+            ? "You are owner"
+            : "Buy"}
         </button>
       </div>
     </div>
