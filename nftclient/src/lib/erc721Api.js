@@ -1,3 +1,5 @@
+import { erc721ManagerInstance } from "./erc721Manager";
+
 // Write Methods
 export const doERC20Approve = async (
   ERC721Manager,
@@ -73,6 +75,15 @@ export const nftTokenCounterId = async (ERC721Manager) => {
   const contractResponse = await ERC721Manager.readContractFunction(
     "get_counter_id",
     [],
+  );
+  return contractResponse;
+};
+
+export const nftTokenURI = async (ERC721Manager, tokenId) => {
+  const contractInvokeData = [tokenId];
+  const contractResponse = await ERC721Manager.readContractFunction(
+    "token_uri",
+    contractInvokeData,
   );
   return contractResponse;
 };

@@ -1,4 +1,4 @@
-import { RpcProvider } from "starknet";
+import { RpcProvider, Contract } from "starknet";
 import { DEPLOYED_CONTRACT_ADDRESS, NODE_URL_API } from "./utils";
 
 class ERC721Manager {
@@ -12,10 +12,12 @@ class ERC721Manager {
   }
 
   async getContractAbi() {
-    const { abi } = await this.getProviderRPCInstance().getClassAt(
-      this.address,
-    );
-    return abi;
+    const abi = await this.getProviderRPCInstance().getClassAt(this.address);
+    if (abi === undefined) {
+      throw new Error("no abi");
+    }
+
+    return abi.abi;
   }
 
   async getERC20ContractAbi(contractAddress) {
@@ -26,26 +28,27 @@ class ERC721Manager {
 
   async getERC20ContractWriteInstance(account, contractAddress) {
     const contractInstance = new Contract(
-      this.getERC20ContractAbi(contractAddress),
+      await this.getERC20ContractAbi(contractAddress),
       contractAddress,
-      account,
+      this.getProviderRPCInstance(),
     );
-    contractInstance;
+    contractInstance.connect(account);
+    return contractInstance;
   }
 
   async getContractWriteInstance(account) {
     const contractInstance = new Contract(
-      this.getContractAbi(),
+      await this.getContractAbi(),
       this.address,
-      account,
+      this.getProviderRPCInstance(),
     );
+    contractInstance.connect(account);
     return contractInstance;
   }
 
   async getContractReadInstance() {
-    const abi = this.getContractAbi();
     const contractReadInstance = new Contract(
-      abi,
+      await this.getContractAbi(),
       this.address,
       this.getProviderRPCInstance(),
     );
@@ -58,7 +61,9 @@ class ERC721Manager {
 
   async readContractFunction(functionName, contractCallData) {
     const contractReadInstance = this.getContractReadInstance();
-    return (await contractReadInstance).call(functionName, contractCallData);
+    return (await contractReadInstance).call(functionName, contractCallData, {
+      parseResponse: true,
+    });
   }
 
   async invokeERC20ApproveFunction(account, contractAddress, contractCallData) {

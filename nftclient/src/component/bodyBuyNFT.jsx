@@ -1,18 +1,14 @@
 import { useAccount } from "@starknet-react/core";
-import {
-  buyNFT,
-  doERC20Approve,
-  ownerOfNFT,
-  priceOfNFT,
-  titleOfNFT,
-} from "../lib/erc721Api";
+import { buyNFT, doERC20Approve } from "../lib/erc721Api";
+import { ethers } from "ethers";
 import { erc721ManagerInstance } from "../lib/erc721Manager";
 import {
   DEPLOYED_CONTRACT_ADDRESS,
   ERC20_ADDRESS,
   sliceAddressForView,
 } from "../lib/utils";
-
+import { useEffect, useState } from "react";
+import { fetchNFTData } from "../lib/erc721BuyList";
 const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
   const { status, account } = useAccount();
   const handleBuyClick = async () => {
@@ -20,17 +16,27 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
       alert(`Connect To Wallet. Disconnected atm`);
       throw Error(`Must be connected to Wallet`);
     }
+
+    if (ownerAddress === account.address) {
+      alert(`You are already owner of this NFT`);
+      throw Error(`You are owner of this nft`);
+    }
     try {
       console.log(`Buying ${tokenId} for ${amount}`);
 
       await doERC20Approve(
         erc721ManagerInstance,
         account,
-        amount,
+        ethers.parseEther(amount),
         ERC20_ADDRESS,
         DEPLOYED_CONTRACT_ADDRESS,
       );
-      await buyNFT(erc721ManagerInstance, account, tokenId, amount);
+      await buyNFT(
+        erc721ManagerInstance,
+        account,
+        tokenId,
+        ethers.parseEther(amount),
+      );
     } catch (error) {
       console.log(error);
     }
@@ -41,9 +47,9 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
       <img className="w-full" src={image} alt="Product" />
       <div className="px-6 py-4">
         <div className="font-bold text-xl mb-2">{text}</div>
-        <p className="text-gray-700 text-base">{amount} eth</p>
+        <p className="text-gray-700 text-base">Amount: {amount} eth</p>
         <p className="text-gray-700 text-base">
-          {sliceAddressForView(ownerAddress)}
+          {`Owner: ${sliceAddressForView(ownerAddress)}`}
         </p>
       </div>
       <div className="px-6 py-4">
@@ -58,10 +64,18 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
   );
 };
 
-const NFTList = (props) => {
+const NFTList = () => {
+  const [NFTData, setNFTData] = useState([]);
+  useEffect(() => {
+    const fetchNFTLists = async () => {
+      const nftData = await fetchNFTData(erc721ManagerInstance);
+      setNFTData(nftData);
+    };
+    fetchNFTLists();
+  }, []);
   return (
     <div className="flex justify-center">
-      {props.NFTData.map((product) => (
+      {NFTData.map((product) => (
         <NFTCard
           key={product.tokenId}
           tokenId={product.tokenId}

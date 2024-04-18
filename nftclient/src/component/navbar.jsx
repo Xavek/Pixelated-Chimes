@@ -19,6 +19,9 @@ const Navbar = () => {
           <button className="bg-white text-black px-6 py-2 mx-2 rounded-md">
             <Link to={`buynft`}>BuyNFT</Link>
           </button>
+          <button className="bg-white text-black px-6 py-2 mx-2 rounded-md">
+            <Link to={`mynfts`}>MY NFTS</Link>
+          </button>
           <ul className="flex items-start">
             {status === "disconnected" &&
               connectors.map((connector) => (

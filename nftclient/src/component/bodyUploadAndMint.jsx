@@ -3,7 +3,7 @@ import { useAccount } from "@starknet-react/core";
 import { validateTokenUri } from "../lib/utils";
 import { erc721ManagerInstance } from "../lib/erc721Manager";
 import { uploadNFT } from "../lib/erc721Api";
-
+import { ethers } from "ethers";
 const UploadForm = () => {
   const { account, status } = useAccount();
   const [submittedURL, setSubmittedURL] = useState("");
@@ -38,7 +38,7 @@ const UploadForm = () => {
         account,
         inputs.tokenName,
         inputs.imageShortUrl,
-        inputs.amount,
+        ethers.parseEther(inputs.amount),
       );
       setInputs({ imageShortUrl: "", amount: "", tokenName: "" });
       setSubmittedURL("");
