@@ -7,13 +7,19 @@ import {
   ERC20_ADDRESS,
   sliceAddressForView,
 } from "../lib/utils";
-
+import { useEffect, useState } from "react";
+import { fetchNFTData } from "../lib/erc721BuyList";
 const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
   const { status, account } = useAccount();
   const handleBuyClick = async () => {
     if (status === "disconnected") {
       alert(`Connect To Wallet. Disconnected atm`);
       throw Error(`Must be connected to Wallet`);
+    }
+
+    if (ownerAddress === account.address) {
+      alert(`You are already owner of this NFT`);
+      throw Error(`You are owner of this nft`);
     }
     try {
       console.log(`Buying ${tokenId} for ${amount}`);
@@ -51,19 +57,25 @@ const NFTCard = ({ tokenId, image, text, amount, ownerAddress }) => {
           className="bg-black text-white px-4 py-2 rounded-md w-full"
           onClick={handleBuyClick}
         >
-          {status === "connected" && account.address === ownerAddress
-            ? "You are owner"
-            : "Buy"}
+          Buy
         </button>
       </div>
     </div>
   );
 };
 
-const NFTList = (props) => {
+const NFTList = () => {
+  const [NFTData, setNFTData] = useState([]);
+  useEffect(() => {
+    const fetchNFTLists = async () => {
+      const nftData = await fetchNFTData(erc721ManagerInstance);
+      setNFTData(nftData);
+    };
+    fetchNFTLists();
+  }, []);
   return (
     <div className="flex justify-center">
-      {props.NFTData.map((product) => (
+      {NFTData.map((product) => (
         <NFTCard
           key={product.tokenId}
           tokenId={product.tokenId}

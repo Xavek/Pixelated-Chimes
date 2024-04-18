@@ -15,8 +15,10 @@ import UploadForm from "./component/bodyUploadAndMint.jsx";
 import NFTList from "./component/bodyBuyNFT.jsx";
 import { fetchNFTData } from "./lib/erc721BuyList.js";
 import { erc721ManagerInstance } from "./lib/erc721Manager.js";
+import MyNFTList from "./component/myNFTList.jsx";
 
 const NFTData = await fetchNFTData(erc721ManagerInstance);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -28,7 +30,11 @@ const router = createBrowserRouter([
       },
       {
         path: "buynft",
-        element: <NFTList NFTData={NFTData} />,
+        element: <NFTList />,
+      },
+      {
+        path: "mynfts",
+        element: <MyNFTList />,
       },
     ],
   },

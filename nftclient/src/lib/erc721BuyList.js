@@ -11,7 +11,7 @@ const NFTDefaultData = [
   {
     tokenId: 9,
     tokenUri: "https://via.placeholder.com/300",
-    tokenName: "First Upload And Mint",
+    tokenName: "First Upload And Mint Or Buy",
     amount: "0.01",
     ownerAddress:
       "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
@@ -19,7 +19,7 @@ const NFTDefaultData = [
   {
     tokenId: 6,
     tokenUri: "https://via.placeholder.com/300",
-    tokenName: "First Upload And Mint",
+    tokenName: "First Upload And Mint Or Buy",
     amount: "0.02",
     ownerAddress:
       "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
@@ -27,7 +27,7 @@ const NFTDefaultData = [
   {
     tokenId: 5,
     tokenUri: "https://via.placeholder.com/300",
-    tokenName: "First Upload And Mint",
+    tokenName: "First Upload And Mint Or Buy",
     amount: "0.1",
     ownerAddress:
       "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
@@ -48,7 +48,7 @@ export const fetchNFTData = async (erc721ManagerInstance) => {
         tokenId: counterId,
         tokenName: shortString.decodeShortString(tokenTitle),
         amount: ethers.formatEther(tokenPrice),
-        ownerAddress: tokenOwner.toString(16),
+        ownerAddress: `0x${tokenOwner.toString(16)}`,
         tokenUri: shortString.decodeShortString(tokenUri),
       };
       console.log(tokenDataObj);
