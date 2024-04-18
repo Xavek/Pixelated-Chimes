@@ -195,7 +195,7 @@ mod ERC721 {
             let owner_or_seller = self.ERC721_owners.read(token_id);
             self
                 ._do_erc20_transfer(
-                    self.ERC20_token_contract.read(), caller, get_contract_address(), amount
+                    self.ERC20_token_contract.read(), caller, owner_or_seller, amount
                 );
             self._transfer(owner_or_seller, caller, token_id);
         }
