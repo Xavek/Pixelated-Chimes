@@ -1,5 +1,3 @@
-import { erc721ManagerInstance } from "./erc721Manager";
-
 // Write Methods
 export const doERC20Approve = async (
   ERC721Manager,

@@ -71,10 +71,12 @@ class ERC721Manager {
       account,
       contractAddress,
     );
-    return (await erc20ContractWriteInstance).invoke(
+    const response =  (await erc20ContractWriteInstance).invoke(
       "approve",
       contractCallData,
     );
+    await this.getProviderRPCInstance().waitForTransaction((await response).transaction_hash)
+    return (await response).transaction_hash
   }
 }
 

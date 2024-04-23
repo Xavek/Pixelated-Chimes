@@ -3,7 +3,7 @@
 export const NODE_URL_API = "https://free-rpc.nethermind.io/sepolia-juno";
 
 export const DEPLOYED_CONTRACT_ADDRESS =
-  "0x06d9c782805710f312e64700b22407e6a1c9a118d18ccaa8d92304ea21edba53";
+  "0x0308445897818779e5aa3b9f3eeb7078c0a5aa4c6376ad7735a9be5e89b93d2c";
 export const ERC20_ADDRESS =
   "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
 

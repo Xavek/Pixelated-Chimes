@@ -40,12 +40,12 @@ export const fetchNFTData = async (erc721ManagerInstance) => {
   if (counterId >= 1) {
     const arrOfObj = [];
     for (let i = 1; i <= counterId; i++) {
-      const tokenTitle = await titleOfNFT(erc721ManagerInstance, counterId);
-      const tokenOwner = await ownerOfNFT(erc721ManagerInstance, counterId);
-      const tokenPrice = await priceOfNFT(erc721ManagerInstance, counterId);
-      const tokenUri = await nftTokenURI(erc721ManagerInstance, counterId);
+      const tokenTitle = await titleOfNFT(erc721ManagerInstance, i);
+      const tokenOwner = await ownerOfNFT(erc721ManagerInstance, i);
+      const tokenPrice = await priceOfNFT(erc721ManagerInstance, i);
+      const tokenUri = await nftTokenURI(erc721ManagerInstance, i);
       const tokenDataObj = {
-        tokenId: counterId,
+        tokenId: i,
         tokenName: shortString.decodeShortString(tokenTitle),
         amount: ethers.formatEther(tokenPrice),
         ownerAddress: `0x${tokenOwner.toString(16)}`,
