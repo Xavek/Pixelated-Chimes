@@ -10,7 +10,6 @@ trait IERC721<T> {
     fn allowed_erc20_address(self: @T) -> ContractAddress;
     fn price_of_token_id(self: @T, token_id: u256) -> u256;
     fn token_title(self: @T, token_id: u256) -> felt252;
-    fn transfer_from(ref self: T, from: ContractAddress, to: ContractAddress, token_id: u256);
     fn upload_and_mint(ref self: T, metadata_uri: felt252, price: u256, token_name: felt252);
     fn buy_nft(ref self: T, token_id: u256, amount: u256);
 }
@@ -18,12 +17,9 @@ trait IERC721<T> {
 #[starknet::interface]
 trait IERC20<TState> {
     fn balance_of(self: @TState, account: ContractAddress) -> u256;
-    fn allowance(self: @TState, owner: ContractAddress, spender: ContractAddress) -> u256;
-    fn transfer(ref self: TState, recipient: ContractAddress, amount: u256) -> bool;
     fn transfer_from(
         ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256
     ) -> bool;
-    fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool;
 }
 
 #[starknet::contract]
@@ -97,12 +93,6 @@ mod ERC721 {
 
         fn price_of_token_id(self: @ContractState, token_id: u256) -> u256 {
             self.ERC721_token_prices.read(token_id)
-        }
-
-        fn transfer_from(
-            ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256
-        ) {
-            self._transfer(from, to, token_id);
         }
 
         fn upload_and_mint(
